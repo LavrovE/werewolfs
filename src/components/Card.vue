@@ -12,7 +12,7 @@
         {{ name }}
       </h3>
       <h3 v-else-if="!showCard && active">
-        {{players[index]}}
+        {{players[position]}}
       </h3>
       <p>card index = {{cardIndex}}</p>
     </div>
@@ -26,6 +26,7 @@
       'action',
       'img',
       'players',
+      'position',
       'index',
       'currentStep',
       'watchAllCards',
@@ -61,38 +62,67 @@
         }
         if (!this.watchAllCards) {
           switch (this.currentStep) {
-            case 'watch-roles':
-              break;
-            case 'Werewolf':
+            // werewolf
+            case 0:
               if (this.wolfsArr.length === 1) {
                 if (this.centered && !this.blocked) {
                   this.watchCard();
-                  this.changeCenterBlockFlags(e,index);
+                  this.makeAllCenterCardsBlocked(e, index);
                 }
               }
               break;
-            case 'Minion':
-              break;
-            case 'Seer':
-              break;
-            case 'Robber':
-              break;
-            case 'Troublemaker':
-              break;
-            case 'Drunk':
-              break;
-            case 'Insomniac':
-              break;
-            case 'Prince':
+            // seer
+            case 3:
+              if (this.index !== 3) {
+                if (this.centered) {
+
+                  this.makeAllPlayersCardsBlocked();
+
+                  this.watchCard();
+
+                  this.makeOneCenterCardBlocked();
+
+                  let cardsArr = [];
+
+                  for (let i = 0; i < this.centerCards.length; i++) {
+                    if (this.centerCards[i].blocked) {
+                      cardsArr.push(this.centerCards[i]);
+                    }
+                  }
+                  if (cardsArr.length > 1) {
+                    this.makeAllCenterCardsBlocked();
+                  }
+
+                } else {
+                  this.makeAllCenterCardsBlocked();
+
+                  this.watchCard();
+
+                  this.makeAllPlayersCardsBlocked();
+                }
+              }
+
               break;
           }
         }
       },
-      changeCenterBlockFlags(e, index) {
-        this.$emit('changecenterblockflags', {
+      makeAllCenterCardsBlocked(e, index) {
+        this.$emit('makeallcentercardsblocked', {
           index: this.index,
           blocked: this.blocked
-      });
+        });
+      },
+      makeAllPlayersCardsBlocked(e, index) {
+        this.$emit('makeallplayerscardsblocked', {
+          index: this.index,
+          blocked: this.blocked
+        });
+      },
+      makeOneCenterCardBlocked(e, index) {
+        this.$emit('makeonecentercardsblocked', {
+          index: this.index,
+          blocked: this.blocked
+        });
       },
       onClick(e, index) {
         this.selfRoleFunction(e, index);

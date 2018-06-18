@@ -18,8 +18,9 @@
             :img="card.img"
             :players="players"
             :key="index"
-            :index="index"
-            :currentStep="roleNameFromIndex"
+            :position="index"
+            :index="card.index"
+            :currentStep="currentStep"
             :watchAllCards="watchAllCards"
             :active="card.active"
             :centered="card.centered"
@@ -27,7 +28,9 @@
             :wolfsArr="wolfsArr"
             :centerCards="centerCards"
             :blocked="card.blocked"
-            @changecenterblockflags="onChangeCenterBlockFlags(index, $event)"
+            @makeonecentercardsblocked="onMakeOneCenterCardBlocked(index, $event)"
+            @makeallcentercardsblocked="onMakeAllCenterCardsBlocked(index, $event)"
+            @makeallplayerscardsblocked="onMakeAllPlayersCardsBlocked(index, $event)"
             @changedata="onChangeData(index, $event)"
           >
           </app-card>
@@ -43,8 +46,9 @@
           :img="card.img"
           :players="players"
           :key="index"
-          :index="index"
-          :currentStep="roleNameFromIndex"
+          :position="index"
+          :index="card.index"
+          :currentStep="currentStep"
           :watchAllCards="watchAllCards"
           :active="card.active"
           :centered="card.centered"
@@ -53,6 +57,9 @@
           :playersArr="playersArr"
           :blocked="card.blocked"
           @changeblockflags="onChangeBlockFlags(index, $event)"
+          @makeonecentercardsblocked="onMakeOneCenterCardBlocked(index, $event)"
+          @makeallcentercardsblocked="onMakeAllCenterCardsBlocked(index, $event)"
+          @makeallplayerscardsblocked="onMakeAllPlayersCardsBlocked(index, $event)"
           @changedata="onChangeData(index, $event)"
         >
         </app-card>
@@ -97,7 +104,7 @@
         // счетчик ходов
         currentStep: 0,
         // таймер для каждого хода (в миллисекундах)
-        secondsForEachRole: 10000,
+        secondsForEachRole: 2000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
         watchAllCards: true,
@@ -197,10 +204,25 @@
         }
         this.checkForWolfes();
       },
+
+      stepWolves() {
+
+        for (let i = 0; i < this.centerCards.length; i++) {
+          this.centerCards[i].blocked = false;
+        }
+
+      },
+
+      stepSeer() {
+
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].blocked = false;
+        }
+
+      },
       checkForWolfes() {
         let self = this;
         for (let i = 0; i < self.constArrPlayers.length; i++) {
-          // console.log(self.constArrPlayers[i].name == "Werewolf")
           if (self.constArrPlayers[i].name == 'Werewolf') {
             self.wolfsArr.push(self.constArrPlayers[i]);
           }
@@ -224,10 +246,7 @@
         this.watchAllCards = false;
 
         if (this.currentStep < 1) {
-
-          for (let i = 0; i < this.centerCards.length; i++) {
-            this.centerCards[i].blocked = false;
-          }
+          this.stepWolves();
         }
 
         let step = data.index;
@@ -238,16 +257,52 @@
 
           self.currentStep++;
 
+          // Добавляем классы, роли , варианты ходов в зависимости от текущего
+
+          switch (self.currentStep) {
+            case 2:
+              console.log('minion');
+              break;
+            case 3:
+              console.log('seer');
+              for (let i = 0; i < self.constArrPlayers.length; i++) {
+                if (self.constArrPlayers[i].index === 3) {
+                  self.stepSeer();
+                }
+              }
+              break;
+            case 4:
+              console.log('robber');
+              break;
+            case 5:
+              console.log('troublemaker');
+              break;
+            case 6:
+              console.log('drunk');
+              break;
+            case 7:
+              console.log('insomniac');
+              break;
+          }
           if (self.currentStep > self.activeRoles) {
             clearInterval(timerId);
+            console.log('end of game')
           }
 
         }, this.secondsForEachRole);
       },
-      onChangeCenterBlockFlags(index, data) {
+      onMakeAllCenterCardsBlocked(index, data) {
         for (let i = 0; i < this.centerCards.length; i++) {
           this.centerCards[i].blocked = true;
         }
+      },
+      onMakeAllPlayersCardsBlocked(index, data) {
+        for (let i = 0; i < this.playersArr.length; i++) {
+          this.playersArr[i].blocked = true;
+        }
+      },
+      onMakeOneCenterCardBlocked(index, data) {
+        this.centerCards[index].blocked = true;
       }
     },
     components: {
