@@ -1,6 +1,10 @@
 <template>
   <div>
     watch all = {{watchAllCards}}
+    <br>
+    <span>
+      blocked = {{ blocked }}
+    </span>
     <div class="card"
          @click="onClick"
     >
@@ -17,7 +21,22 @@
 
 <script>
   export default {
-    props: ['name', 'action', 'img', 'players', 'index', 'currentStep', 'watchAllCards', 'centered', 'active', 'cardIndex', 'wolfsArr', 'playersArr', 'centerCards', 'watched'],
+    props: [
+      'name',
+      'action',
+      'img',
+      'players',
+      'index',
+      'currentStep',
+      'watchAllCards',
+      'centered',
+      'active',
+      'cardIndex',
+      'wolfsArr',
+      'playersArr',
+      'centerCards',
+      'blocked'
+    ],
     data() {
       return {
         showCard: false
@@ -26,7 +45,9 @@
     computed: {},
     methods: {
       watchCard() {
-        this.showCard = true;
+        if (!this.blocked || this.watchAllCards) {
+          this.showCard = true;
+        }
         setTimeout(this.hideCard, 2000);
       },
       hideCard() {
@@ -44,36 +65,35 @@
               break;
             case 'Werewolf':
               if (this.wolfsArr.length === 1) {
-                if (this.centered && !this.watched) {
+                if (this.centered && !this.blocked) {
                   this.watchCard();
-                  this.watched = true;
+                  this.changeCenterBlockFlags(e,index);
                 }
               }
               break;
             case 'Minion':
               break;
             case 'Seer':
-              // this.watchCard();
               break;
             case 'Robber':
-              // this.watchAndSwapNoCenterCard();
               break;
             case 'Troublemaker':
-              // this.swapOtherNotCenterCards();
               break;
             case 'Drunk':
-              // this.swapCenterCard();
               break;
             case 'Insomniac':
-              // this.watchCard();
               break;
             case 'Prince':
-              // alert('Мимо');
               break;
           }
         }
-      }
-      ,
+      },
+      changeCenterBlockFlags(e, index) {
+        this.$emit('changecenterblockflags', {
+          index: this.index,
+          blocked: this.blocked
+      });
+      },
       onClick(e, index) {
         this.selfRoleFunction(e, index);
       }

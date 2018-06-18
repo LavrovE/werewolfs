@@ -26,8 +26,8 @@
             :cardIndex="card.index"
             :wolfsArr="wolfsArr"
             :centerCards="centerCards"
-            :watched="card.watched"
-            @watchonecenter="centerWasWatched(index, $event)"
+            :blocked="card.blocked"
+            @changecenterblockflags="onChangeCenterBlockFlags(index, $event)"
             @changedata="onChangeData(index, $event)"
           >
           </app-card>
@@ -51,7 +51,8 @@
           :cardIndex="card.index"
           :wolfsArr="wolfsArr"
           :playersArr="playersArr"
-          :watched="card.watched"
+          :blocked="card.blocked"
+          @changeblockflags="onChangeBlockFlags(index, $event)"
           @changedata="onChangeData(index, $event)"
         >
         </app-card>
@@ -65,6 +66,7 @@
 
       </app-button>
       <p>current role - {{roleNameFromIndex}}</p>
+      <p>current role id - {{currentStep}}</p>
     </div>
   </div>
 </template>
@@ -78,13 +80,21 @@
   export default {
     data() {
       return {
-        opening:true,
-        checkRoles:false,
-        game:false,
+        //Этап 1 - нажатие кнопки и начало смешивания карт
+        opening: true,
+        //Этап 2 - Проверка ролей
+        checkRoles: false,
+        //Этап 3 - Старт игры с центральными картами и картами игроков (смотреть ВСЕМ на данном этапе уже нельзя)
+        game: false,
+        //Имена и колиество игроков
         players: ['Рома', 'Вова', 'Аня', 'Женя', 'Таня', 'Родик'],
+        // Карты игроков после шафла
         playersArr: [],
+        // Центральные карты
         centerCards: [],
+        // Карты игроков, которые были сданы изначально (независимо от обмена картами)
         constArrPlayers: [],
+        // счетчик ходов
         currentStep: 0,
         // таймер для каждого хода (в миллисекундах)
         secondsForEachRole: 10000,
@@ -95,56 +105,57 @@
         cards: [
           {
             name: 'Werewolf',
-            actions: ['watch'],
             img: './img/werewolf.png',
+            blocked: true,
             index: 0
           },
           {
             name: 'Werewolf',
-            actions: ['watch'],
             img: './img/werewolf.png',
+            blocked: true,
             index: 1
           },
           {
             name: 'Minion',
             actions: [],
             img: './img/minion.png',
+            blocked: true,
             index: 2
           },
           {
             name: 'Seer',
-            actions: ['watch'],
             img: './img/seer.png',
+            blocked: true,
             index: 3
           },
           {
             name: 'Robber',
-            actions: ['watch-and-swap'],
             img: './img/robber.png',
+            blocked: true,
             index: 4
           },
           {
             name: 'Troublemaker',
-            actions: ['swap-two'],
             img: './img/troublemaker.png',
+            blocked: true,
             index: 5
           },
           {
             name: 'Drunk',
-            actions: ['swap-center'],
             img: './img/drunk.png',
+            blocked: true,
             index: 6
           },
           {
             name: 'Insomniac',
-            actions: ['watch'],
             img: './img/insomniac.png',
+            blocked: true,
             index: 7
           },
           {
             name: 'Prince',
-            actions: [],
             img: './img/prince.png',
+            blocked: true,
             index: 8
           }
         ]
@@ -154,7 +165,6 @@
       for (let i = 0; i < this.cards.length; i++) {
         this.cards[i].active = false;
         this.cards[i].centered = false;
-        this.cards[i].watched = false;
       }
     },
     computed: {
@@ -163,6 +173,10 @@
       }
     },
     methods: {
+      centerDisabled(index, data) {
+        this.showCenter = data.showCenter;
+        console.log(this.showCenter)
+      },
       shuffleCards() {
         for (let i = 0; i < this.players.length; i++) {
           while (1) {
@@ -200,23 +214,21 @@
       onChangeData(index, data) {
         this.cards[index].name = data.name;
       },
-      // centerWasWatched(index, data) {
-      //   for (let i = 0; i < this.centerCards.length; i++) {
-      //     // this.centerCards[i].watched = data.watched;
-      //     if(data.watched){
-      //       this.centerCards[i].watched = data.watched;
-      //     }
-      //   }
-      // },
 
       onChangeFirstRole(data) {
 
         this.checkRoles = false;
+
         this.game = true;
 
         this.watchAllCards = false;
 
-        this.currentStep = data.firstRole;
+        if (this.currentStep < 1) {
+
+          for (let i = 0; i < this.centerCards.length; i++) {
+            this.centerCards[i].blocked = false;
+          }
+        }
 
         let step = data.index;
 
@@ -226,16 +238,16 @@
 
           self.currentStep++;
 
-          console.log(self.currentStep);
-
           if (self.currentStep > self.activeRoles) {
             clearInterval(timerId);
           }
 
         }, this.secondsForEachRole);
-
-
-
+      },
+      onChangeCenterBlockFlags(index, data) {
+        for (let i = 0; i < this.centerCards.length; i++) {
+          this.centerCards[i].blocked = true;
+        }
       }
     },
     components: {
