@@ -117,9 +117,7 @@
               }
               break;
             // robber
-            case
-            4
-            :
+            case 4:
               for (let i = 0; i < this.constArrPlayers.length; i++) {
                 if (this.constArrPlayers[i].constIndex === 4) {
                   if (this.constIndex !== 4 && this.active) {
@@ -127,8 +125,37 @@
                       this.swapCardRobber(e, index);
                       this.hideCard();
                     } else {
-                      this.showCardRobber();
+                      this.showCardRobber(e, index);
                       this.watchCardNoHide();
+                    }
+                  }
+                }
+              }
+              break;
+            // troublemaker
+            case 5:
+              for (let i = 0; i < this.constArrPlayers.length; i++) {
+
+                if (this.constArrPlayers[i].constIndex === 5) {
+
+                  if (this.constIndex !== 5 && this.active && !this.blocked) {
+
+                    // первый клик
+
+                    let tempArr = [];
+
+                    for (let y = 0; y < this.playersArr.length; y++) {
+                      if (this.playersArr[y].picked) {
+                        tempArr.push(this.playersArr[y].picked);
+                        this.swapCardTroubleMaker(e, index);
+                        this.makeAllCardsUnpicked(e, index);
+                        console.log('вариант2')
+                      }
+                    }
+                    if (tempArr.length === 0) {
+                      this.pickCardTroubleMaker(e, index);
+                      console.log('вариант1')
+
                     }
                   }
                 }
@@ -137,37 +164,61 @@
           }
         }
       },
+
       makeAllCenterCardsBlocked(e, index) {
         this.$emit('makeallcentercardsblocked', {
           index: this.index,
           blocked: this.blocked
         });
       },
+
       makeAllPlayersCardsBlocked(e, index) {
         this.$emit('makeallplayerscardsblocked', {
           index: this.index,
           blocked: this.blocked
         });
       },
+
       makeOneCenterCardBlocked(e, index) {
         this.$emit('makeonecentercardsblocked', {
           index: this.index,
           blocked: this.blocked
         });
       },
-      showCardRobber() {
+
+      makeAllCardsUnpicked(e, index) {
+        this.$emit('makeallcardsunpicked', {});
+      },
+
+
+      showCardRobber(e, index) {
         this.$emit('showcardrobber', {
           position: this.position
         });
       },
+
       swapCardRobber(e, index) {
         this.$emit('swapcardrobber', {
           position: this.position
         });
       },
+
+      pickCardTroubleMaker(e, index) {
+        this.$emit('pickcardtroublemaker', {
+          position: this.position
+        });
+      },
+
+      swapCardTroubleMaker(e, index) {
+        this.$emit('swapcardstroublemaker', {
+          position: this.position
+        });
+      },
+
       onClick(e, index) {
         this.selfRoleFunction(e, index);
       }
+
     }
   }
 </script>

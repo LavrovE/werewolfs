@@ -35,6 +35,9 @@
             @makeallplayerscardsblocked="onMakeAllPlayersCardsBlocked(index, $event)"
             @showcardrobber="onShowCardRobber(index,$event)"
             @swapcardrobber="onSwapCardRobber(index, $event)"
+            @pickcardtroublemaker="onPickCardTroubleMaker(index, $event)"
+            @swapcardstroublemaker="onSwapCardsTroubleMaker(index, $event)"
+            @makeallcardsunpicked="onMakeAllCardsUnpicked(index, $event)"
             @changedata="onChangeData(index, $event)"
           >
           </app-card>
@@ -68,6 +71,9 @@
           @makeallplayerscardsblocked="onMakeAllPlayersCardsBlocked(index, $event)"
           @showcardrobber="onShowCardRobber(index,$event)"
           @swapcardrobber="onSwapCardRobber(index, $event)"
+          @pickcardtroublemaker="onPickCardTroubleMaker(index, $event)"
+          @swapcardstroublemaker="onSwapCardsTroubleMaker(index, $event)"
+          @makeallcardsunpicked="onMakeAllCardsUnpicked(index, $event)"
           @changedata="onChangeData(index, $event)"
         >
         </app-card>
@@ -110,9 +116,9 @@
         // Карты игроков, которые были сданы изначально (независимо от обмена картами)
         constArrPlayers: [],
         // счетчик ходов
-        currentStep: 0,
+        currentStep: 4,
         // таймер для каждого хода (в миллисекундах)
-        secondsForEachRole: 2000,
+        secondsForEachRole: 10000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
         watchAllCards: true,
@@ -268,6 +274,10 @@
         this.unblockPlayerCards();
       },
 
+      stepTroublemaker(){
+        this.unblockPlayerCards();
+      },
+
       checkForWolfes() {
         let self = this;
         for (let i = 0; i < self.constArrPlayers.length; i++) {
@@ -325,14 +335,16 @@
               for (let i = 0; i < self.constArrPlayers.length; i++) {
                 if (self.constArrPlayers[i].constIndex === 4) {
                   self.stepRobber();
-                  console.log('est')
                 } else {
-                  console.log('net')
                 }
               }
               break;
             case 5:
-              console.log('troublemaker');
+              for (let i = 0; i < self.constArrPlayers.length; i++) {
+                if (self.constArrPlayers[i].constIndex === 5) {
+                  self.stepTroublemaker();
+                }
+              }
               break;
             case 6:
               console.log('drunk');
@@ -364,6 +376,12 @@
         this.centerCards[index].blocked = true;
       },
 
+      onMakeAllCardsUnpicked(index, data){
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].picked = false;
+        }
+      },
+
       onShowCardRobber(index, data) {
           console.log(data);
           this.playersArr[data.position].flipped = true;
@@ -388,7 +406,29 @@
 
         this.$set(this.playersArr, data.position, this.playersArr[robberCardIndex]);
         this.$set(this.playersArr, robberCardIndex, temp);
+      },
+
+      onPickCardTroubleMaker(index, data){
+
+        this.playersArr[data.position].picked = true;
+
+      },
+
+      onSwapCardsTroubleMaker(index, data){
+        let temp = this.playersArr[data.position];
+
+        let pickedCardIndex;
+
+        for(let i=0;i<this.playersArr.length;i++){
+          if(this.playersArr[i].picked){
+            pickedCardIndex = i;
+          }
+        }
+        this.$set(this.playersArr, data.position, this.playersArr[pickedCardIndex]);
+        this.$set(this.playersArr, pickedCardIndex, temp);
+        this.blockAllCards();
       }
+
     },
     components: {
       AppCard,
