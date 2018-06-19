@@ -14,23 +14,27 @@
           <app-card
             v-for="(card, index) in  centerCards"
             :name="card.name"
-            :action="card.actions"
             :img="card.img"
             :players="players"
             :key="index"
             :position="index"
-            :index="card.index"
+            :constIndex="card.constIndex"
             :currentStep="currentStep"
             :watchAllCards="watchAllCards"
             :active="card.active"
             :centered="card.centered"
             :cardIndex="card.index"
             :wolfsArr="wolfsArr"
+            :constArrPlayers="constArrPlayers"
             :centerCards="centerCards"
             :blocked="card.blocked"
+            :flipped="card.flipped"
+            :picked="card.picked"
             @makeonecentercardsblocked="onMakeOneCenterCardBlocked(index, $event)"
             @makeallcentercardsblocked="onMakeAllCenterCardsBlocked(index, $event)"
             @makeallplayerscardsblocked="onMakeAllPlayersCardsBlocked(index, $event)"
+            @showcardrobber="onShowCardRobber(index,$event)"
+            @swapcardrobber="onSwapCardRobber(index, $event)"
             @changedata="onChangeData(index, $event)"
           >
           </app-card>
@@ -42,12 +46,11 @@
         <app-card
           v-for="(card, index) in  playersArr"
           :name="card.name"
-          :action="card.actions"
           :img="card.img"
           :players="players"
           :key="index"
           :position="index"
-          :index="card.index"
+          :constIndex="card.constIndex"
           :currentStep="currentStep"
           :watchAllCards="watchAllCards"
           :active="card.active"
@@ -55,11 +58,16 @@
           :cardIndex="card.index"
           :wolfsArr="wolfsArr"
           :playersArr="playersArr"
+          :constArrPlayers="constArrPlayers"
           :blocked="card.blocked"
+          :flipped="card.flipped"
+          :picked="card.picked"
           @changeblockflags="onChangeBlockFlags(index, $event)"
           @makeonecentercardsblocked="onMakeOneCenterCardBlocked(index, $event)"
           @makeallcentercardsblocked="onMakeAllCenterCardsBlocked(index, $event)"
           @makeallplayerscardsblocked="onMakeAllPlayersCardsBlocked(index, $event)"
+          @showcardrobber="onShowCardRobber(index,$event)"
+          @swapcardrobber="onSwapCardRobber(index, $event)"
           @changedata="onChangeData(index, $event)"
         >
         </app-card>
@@ -114,56 +122,74 @@
             name: 'Werewolf',
             img: './img/werewolf.png',
             blocked: true,
-            index: 0
+            flipped: false,
+            picked: false,
+            constIndex: 0
           },
           {
             name: 'Werewolf',
             img: './img/werewolf.png',
             blocked: true,
-            index: 1
+            flipped: false,
+            picked: false,
+            constIndex: 1
           },
           {
             name: 'Minion',
             actions: [],
             img: './img/minion.png',
             blocked: true,
-            index: 2
+            flipped: false,
+            picked: false,
+            constIndex: 2
           },
           {
             name: 'Seer',
             img: './img/seer.png',
             blocked: true,
-            index: 3
+            flipped: false,
+            picked: false,
+            constIndex: 3
           },
           {
             name: 'Robber',
             img: './img/robber.png',
             blocked: true,
-            index: 4
+            flipped: false,
+            picked: false,
+            constIndex: 4
           },
           {
             name: 'Troublemaker',
             img: './img/troublemaker.png',
             blocked: true,
-            index: 5
+            flipped: false,
+            picked: false,
+            constIndex: 5
           },
           {
             name: 'Drunk',
             img: './img/drunk.png',
             blocked: true,
-            index: 6
+            flipped: false,
+            picked: false,
+            constIndex: 6
           },
           {
             name: 'Insomniac',
             img: './img/insomniac.png',
             blocked: true,
-            index: 7
+            flipped: false,
+            picked: false,
+            constIndex: 7
           },
           {
             name: 'Prince',
             img: './img/prince.png',
             blocked: true,
-            index: 8
+            flipped: false,
+            picked: false,
+            constIndex: 8
           }
         ]
       }
@@ -205,21 +231,43 @@
         this.checkForWolfes();
       },
 
-      stepWolves() {
+      unblockAllCards() {
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].blocked = false;
+          console.log('unblocked')
+        }
+      },
 
+      unblockCenterCards() {
         for (let i = 0; i < this.centerCards.length; i++) {
           this.centerCards[i].blocked = false;
         }
+      },
 
+      unblockPlayerCards() {
+        for (let i = 0; i < this.playersArr.length; i++) {
+          this.playersArr[i].blocked = false;
+        }
+      },
+
+      blockAllCards() {
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].blocked = true;
+        }
+      },
+
+      stepWolves() {
+        this.unblockCenterCards();
       },
 
       stepSeer() {
-
-        for (let i = 0; i < this.cards.length; i++) {
-          this.cards[i].blocked = false;
-        }
-
+        this.unblockAllCards();
       },
+
+      stepRobber() {
+        this.unblockPlayerCards();
+      },
+
       checkForWolfes() {
         let self = this;
         for (let i = 0; i < self.constArrPlayers.length; i++) {
@@ -228,6 +276,7 @@
           }
         }
       },
+
       setOptions() {
         this.shuffleCards();
         this.opening = false;
@@ -266,13 +315,21 @@
             case 3:
               console.log('seer');
               for (let i = 0; i < self.constArrPlayers.length; i++) {
-                if (self.constArrPlayers[i].index === 3) {
+                if (self.constArrPlayers[i].constIndex === 3) {
                   self.stepSeer();
                 }
               }
               break;
             case 4:
               console.log('robber');
+              for (let i = 0; i < self.constArrPlayers.length; i++) {
+                if (self.constArrPlayers[i].constIndex === 4) {
+                  self.stepRobber();
+                  console.log('est')
+                } else {
+                  console.log('net')
+                }
+              }
               break;
             case 5:
               console.log('troublemaker');
@@ -296,13 +353,41 @@
           this.centerCards[i].blocked = true;
         }
       },
+
       onMakeAllPlayersCardsBlocked(index, data) {
         for (let i = 0; i < this.playersArr.length; i++) {
           this.playersArr[i].blocked = true;
         }
       },
+
       onMakeOneCenterCardBlocked(index, data) {
         this.centerCards[index].blocked = true;
+      },
+
+      onShowCardRobber(index, data) {
+          console.log(data);
+          this.playersArr[data.position].flipped = true;
+      },
+
+
+      onSwapCardRobber(index, data) {
+
+        // карта, которую кликнули
+
+        let temp = this.playersArr[data.position];
+
+        // дефолтный индекс роббера
+
+        let robberCardIndex;
+
+        for (let i = 0; i < this.playersArr.length; i++) {
+          if (this.playersArr[i].constIndex === 4) {
+            robberCardIndex = i;
+          }
+        }
+
+        this.$set(this.playersArr, data.position, this.playersArr[robberCardIndex]);
+        this.$set(this.playersArr, robberCardIndex, temp);
       }
     },
     components: {

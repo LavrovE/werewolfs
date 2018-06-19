@@ -14,7 +14,9 @@
       <h3 v-else-if="!showCard && active">
         {{players[position]}}
       </h3>
-      <p>card index = {{cardIndex}}</p>
+      <p>card index = {{constIndex}}</p>
+      <p>flipped = {{flipped}}</p>
+      <p>picked = {{picked}}</p>
     </div>
   </div>
 </template>
@@ -23,11 +25,10 @@
   export default {
     props: [
       'name',
-      'action',
       'img',
       'players',
       'position',
-      'index',
+      'constIndex',
       'currentStep',
       'watchAllCards',
       'centered',
@@ -35,8 +36,11 @@
       'cardIndex',
       'wolfsArr',
       'playersArr',
+      'constArrPlayers',
       'centerCards',
-      'blocked'
+      'blocked',
+      'flipped',
+      'picked'
     ],
     data() {
       return {
@@ -50,6 +54,11 @@
           this.showCard = true;
         }
         setTimeout(this.hideCard, 2000);
+      },
+      watchCardNoHide() {
+        if (!this.blocked || this.watchAllCards) {
+          this.showCard = true;
+        }
       },
       hideCard() {
         this.showCard = false;
@@ -73,35 +82,57 @@
               break;
             // seer
             case 3:
-              if (this.index !== 3) {
-                if (this.centered) {
 
-                  this.makeAllPlayersCardsBlocked();
+              for (let i = 0; i < this.constArrPlayers.length; i++) {
 
-                  this.watchCard();
+                if (this.constArrPlayers[i].constIndex === 3) {
 
-                  this.makeOneCenterCardBlocked();
+                  if (this.constIndex !== 3 && this.centered) {
 
-                  let cardsArr = [];
+                    this.makeAllPlayersCardsBlocked(e, index);
 
-                  for (let i = 0; i < this.centerCards.length; i++) {
-                    if (this.centerCards[i].blocked) {
-                      cardsArr.push(this.centerCards[i]);
+                    this.watchCard();
+
+                    this.makeOneCenterCardBlocked(e, index);
+
+                    let cardsArr = [];
+
+                    for (let i = 0; i < this.centerCards.length; i++) {
+                      if (this.centerCards[i].blocked) {
+                        cardsArr.push(this.centerCards[i]);
+                      }
+                    }
+                    if (cardsArr.length > 1) {
+                      this.makeAllCenterCardsBlocked(e, index);
                     }
                   }
-                  if (cardsArr.length > 1) {
-                    this.makeAllCenterCardsBlocked();
+                  else {
+                    this.makeAllCenterCardsBlocked(e, index);
+
+                    this.watchCard();
+
+                    this.makeAllPlayersCardsBlocked(e, index);
                   }
-
-                } else {
-                  this.makeAllCenterCardsBlocked();
-
-                  this.watchCard();
-
-                  this.makeAllPlayersCardsBlocked();
                 }
               }
-
+              break;
+            // robber
+            case
+            4
+            :
+              for (let i = 0; i < this.constArrPlayers.length; i++) {
+                if (this.constArrPlayers[i].constIndex === 4) {
+                  if (this.constIndex !== 4 && this.active) {
+                    if (this.flipped) {
+                      this.swapCardRobber(e, index);
+                      this.hideCard();
+                    } else {
+                      this.showCardRobber();
+                      this.watchCardNoHide();
+                    }
+                  }
+                }
+              }
               break;
           }
         }
@@ -122,6 +153,16 @@
         this.$emit('makeonecentercardsblocked', {
           index: this.index,
           blocked: this.blocked
+        });
+      },
+      showCardRobber() {
+        this.$emit('showcardrobber', {
+          position: this.position
+        });
+      },
+      swapCardRobber(e, index) {
+        this.$emit('swapcardrobber', {
+          position: this.position
         });
       },
       onClick(e, index) {
