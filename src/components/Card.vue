@@ -168,7 +168,19 @@
                     }
                     if (tempArr.length === 0) {
                       this.pickCardTroubleMaker(e, index);
+                      this.makeAllCenterCardsBlocked(e, index);
+                      this.makeAllPlayersCardsBlocked(e, index);
                     }
+                  }
+                }
+              }
+              break;
+            // drunk
+            case 6:
+              for (let i = 0; i < this.constArrPlayers.length; i++) {
+                if (this.constArrPlayers[i].constIndex === 6) {
+                  if (this.centered && !this.blocked) {
+                    this.swapCardDrunk(e, index);
                   }
                 }
               }
@@ -223,6 +235,12 @@
 
       swapCardTroubleMaker(e, index) {
         this.$emit('swapcardstroublemaker', {
+          position: this.position
+        });
+      },
+
+      swapCardDrunk(e, index) {
+        this.$emit('swapcarddrunk', {
           position: this.position
         });
       },

@@ -38,6 +38,7 @@
             @pickcardtroublemaker="onPickCardTroubleMaker(index, $event)"
             @swapcardstroublemaker="onSwapCardsTroubleMaker(index, $event)"
             @makeallcardsunpicked="onMakeAllCardsUnpicked(index, $event)"
+            @swapcarddrunk="onSwapCardDrunk(index, $event)"
             @changedata="onChangeData(index, $event)"
           >
           </app-card>
@@ -75,6 +76,7 @@
           @pickcardtroublemaker="onPickCardTroubleMaker(index, $event)"
           @swapcardstroublemaker="onSwapCardsTroubleMaker(index, $event)"
           @makeallcardsunpicked="onMakeAllCardsUnpicked(index, $event)"
+          @swapcarddrunk="onSwapCardDrunk(index, $event)"
           @changedata="onChangeData(index, $event)"
         >
         </app-card>
@@ -119,7 +121,7 @@
         // счетчик ходов
         currentStep: 0,
         // таймер для каждого хода (в миллисекундах)
-        secondsForEachRole: 5000,
+        secondsForEachRole: 10000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
         watchAllCards: true,
@@ -263,6 +265,18 @@
         }
       },
 
+      refreshCenterAndActiveCards(){
+        for (let i = 0; i < this.centerCards.length; i++) {
+          this.centerCards[i].centered = true;
+          this.centerCards[i].active = false;
+
+        }
+        for (let i = 0; i < this.playersArr.length; i++) {
+          this.playersArr[i].active = true;
+          this.playersArr[i].centered = false;
+        }
+      },
+
       stepWolves() {
         this.unblockCenterCards();
       },
@@ -352,7 +366,11 @@
               }
               break;
             case 6:
-              console.log('drunk');
+              for (let i = 0; i < self.constArrPlayers.length; i++) {
+                if (self.constArrPlayers[i].constIndex === 6) {
+                  self.unblockCenterCards();
+                }
+              }
               break;
             case 7:
               console.log('insomniac');
@@ -420,6 +438,7 @@
       },
 
       onSwapCardsTroubleMaker(index, data){
+
         let temp = this.playersArr[data.position];
 
         let pickedCardIndex;
@@ -431,6 +450,22 @@
         }
         this.$set(this.playersArr, data.position, this.playersArr[pickedCardIndex]);
         this.$set(this.playersArr, pickedCardIndex, temp);
+        this.blockAllCards();
+      },
+
+      onSwapCardDrunk(index, data){
+        let clickedCard = this.centerCards[data.position];
+        let drunkCardIndex;
+
+        for(let i=0;i<this.constArrPlayers.length;i++){
+          if(this.constArrPlayers[i].constIndex === 6){
+            drunkCardIndex = i;
+          }
+        }
+        this.$set(this.centerCards, data.position, this.constArrPlayers[drunkCardIndex]);
+        this.$set(this.playersArr, drunkCardIndex, clickedCard);
+
+        this.refreshCenterAndActiveCards();
         this.blockAllCards();
       }
 
