@@ -121,7 +121,7 @@
         // счетчик ходов
         currentStep: 0,
         // таймер для каждого хода (в миллисекундах)
-        secondsForEachRole: 10000,
+        secondsForEachRole: 3000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
         watchAllCards: true,
@@ -455,15 +455,16 @@
 
       onSwapCardDrunk(index, data){
         let clickedCard = this.centerCards[data.position];
-        let drunkCardIndex;
+        let constDrunkCardIndex;
 
         for(let i=0;i<this.constArrPlayers.length;i++){
           if(this.constArrPlayers[i].constIndex === 6){
-            drunkCardIndex = i;
+            constDrunkCardIndex = i;
           }
         }
-        this.$set(this.centerCards, data.position, this.constArrPlayers[drunkCardIndex]);
-        this.$set(this.playersArr, drunkCardIndex, clickedCard);
+
+        this.$set(this.centerCards, data.position, this.playersArr[constDrunkCardIndex]);
+        this.$set(this.playersArr, constDrunkCardIndex, clickedCard);
 
         this.refreshCenterAndActiveCards();
         this.blockAllCards();
