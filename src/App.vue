@@ -121,7 +121,7 @@
         // счетчик ходов
         currentStep: 0,
         // таймер для каждого хода (в миллисекундах)
-        secondsForEachRole: 10000,
+        secondsForEachRole: 3000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
         watchAllCards: true,

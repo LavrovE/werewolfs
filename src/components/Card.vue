@@ -159,17 +159,22 @@
 
                     let tempArr = [];
 
-                    for (let y = 0; y < this.playersArr.length; y++) {
-                      if (this.playersArr[y].picked) {
-                        tempArr.push(this.playersArr[y].picked);
-                        this.swapCardTroubleMaker(e, index);
-                        this.makeAllCardsUnpicked(e, index);
+                    if(!this.picked){
+                      for (let y = 0; y < this.playersArr.length; y++) {
+                        if (this.playersArr[y].picked) {
+                          tempArr.push(this.playersArr[y].picked);
+                          this.swapCardTroubleMaker(e, index);
+                          this.makeAllCardsUnpicked(e, index);
+                          console.log('swap card')
+
+                        }
                       }
                     }
                     if (tempArr.length === 0) {
                       this.pickCardTroubleMaker(e, index);
-                      this.makeAllCenterCardsBlocked(e, index);
-                      this.makeAllPlayersCardsBlocked(e, index);
+                      console.log('pick card')
+                      // this.makeAllCenterCardsBlocked(e, index);
+                      // this.makeAllPlayersCardsBlocked(e, index);
                     }
                   }
                 }
