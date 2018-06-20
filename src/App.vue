@@ -117,7 +117,7 @@
         // Карты игроков, которые были сданы изначально (независимо от обмена картами)
         constArrPlayers: [],
         // счетчик ходов
-        currentStep: 3,
+        currentStep: 0,
         // таймер для каждого хода (в миллисекундах)
         secondsForEachRole: 5000,
         // число активных игроков (у которых есть свой ход в игре)
@@ -305,11 +305,15 @@
 
         this.watchAllCards = false;
 
-        if (this.currentStep < 1) {
+        let step = data.firstRole;
+
+        this.currentStep = step;
+
+        if (this.currentStep < 2) {
           this.stepWolves();
         }
 
-        let step = data.index;
+
 
         let self = this;
 

@@ -13,17 +13,14 @@
     props: ['currentStep'],
     data() {
       return {
-        firstRole: 0
+        firstRole: 1
       }
     },
     computed: {},
     methods: {
       startGame(e) {
-        let count = 0;
-        count ++;
         this.$emit('changefirstrole', {
-          firstRole: this.firstRole,
-          index: count
+          firstRole: this.firstRole
         });
       }
       // onClick(e) {

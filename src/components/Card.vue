@@ -72,7 +72,7 @@
         if (!this.watchAllCards) {
           switch (this.currentStep) {
             // werewolf
-            case 0:
+            case 1:
               if (this.wolfsArr.length === 1) {
                 if (this.centered && !this.blocked) {
                   this.watchCard();
