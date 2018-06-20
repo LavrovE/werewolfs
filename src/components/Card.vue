@@ -106,13 +106,27 @@
                       this.makeAllCenterCardsBlocked(e, index);
                     }
                   }
-                  else {
-                    this.makeAllCenterCardsBlocked(e, index);
+                  else if (this.constIndex !== 3 && this.active) {
 
-                    this.watchCard();
+                    let cardsArr = [];
 
-                    this.makeAllPlayersCardsBlocked(e, index);
+                    for (let i = 0; i < this.centerCards.length; i++) {
+                      if (this.centerCards[i].blocked) {
+                        cardsArr.push(this.centerCards[i]);
+                      }
+                    }
+
+                    // если нажали на одну центральную карту, а потом на игровую
+
+                    if (cardsArr.length <= 0) {
+                      this.watchCard();
+                      this.makeAllCenterCardsBlocked(e, index);
+                      this.makeAllPlayersCardsBlocked(e, index);
+                    } else {
+
+                    }
                   }
+
                 }
               }
               break;
@@ -149,13 +163,10 @@
                         tempArr.push(this.playersArr[y].picked);
                         this.swapCardTroubleMaker(e, index);
                         this.makeAllCardsUnpicked(e, index);
-                        console.log('вариант2')
                       }
                     }
                     if (tempArr.length === 0) {
                       this.pickCardTroubleMaker(e, index);
-                      console.log('вариант1')
-
                     }
                   }
                 }

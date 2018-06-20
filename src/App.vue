@@ -58,6 +58,7 @@
           :watchAllCards="watchAllCards"
           :active="card.active"
           :centered="card.centered"
+          :centerCards="centerCards"
           :cardIndex="card.index"
           :wolfsArr="wolfsArr"
           :playersArr="playersArr"
@@ -116,9 +117,9 @@
         // Карты игроков, которые были сданы изначально (независимо от обмена картами)
         constArrPlayers: [],
         // счетчик ходов
-        currentStep: 4,
+        currentStep: 2,
         // таймер для каждого хода (в миллисекундах)
-        secondsForEachRole: 10000,
+        secondsForEachRole: 5000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
         watchAllCards: true,
