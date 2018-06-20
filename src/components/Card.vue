@@ -135,6 +135,7 @@
               for (let i = 0; i < this.constArrPlayers.length; i++) {
                 if (this.constArrPlayers[i].constIndex === 4) {
                   if (this.constIndex !== 4 && this.active) {
+                    this.makeAllPlayersCardsBlocked(e, index);
                     if (this.flipped) {
                       this.swapCardRobber(e, index);
                       this.hideCard();
