@@ -13,7 +13,7 @@
     props: ['currentStep'],
     data() {
       return {
-        firstRole: 4
+        firstRole: 1
       }
     },
     computed: {},
