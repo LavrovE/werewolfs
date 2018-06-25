@@ -63,6 +63,119 @@
       hideCard() {
         this.showCard = false;
       },
+      singleWolf(e, index) {
+        if (this.wolfsArr.length === 1) {
+          if (this.centered && !this.blocked) {
+            this.watchCard();
+            this.makeAllCenterCardsBlocked(e, index);
+          }
+        }
+      },
+      seerRole(e, index) {
+        for (let i = 0; i < this.constArrPlayers.length; i++) {
+
+          if (this.constArrPlayers[i].constIndex === 3) {
+
+            if (this.constIndex !== 3 && this.centered) {
+
+              this.makeAllPlayersCardsBlocked(e, index);
+
+              this.watchCard();
+
+              this.makeOneCenterCardBlocked(e, index);
+
+              let cardsArr = [];
+
+              for (let i = 0; i < this.centerCards.length; i++) {
+                if (this.centerCards[i].blocked) {
+                  cardsArr.push(this.centerCards[i]);
+                }
+              }
+              if (cardsArr.length > 1) {
+                this.makeAllCenterCardsBlocked(e, index);
+              }
+            }
+            else if (this.constIndex !== 3 && this.active) {
+
+              let cardsArr = [];
+
+              for (let i = 0; i < this.centerCards.length; i++) {
+                if (this.centerCards[i].blocked) {
+                  cardsArr.push(this.centerCards[i]);
+                }
+              }
+
+              // если нажали на одну центральную карту, а потом на игровую
+
+              if (cardsArr.length <= 0) {
+                this.watchCard();
+                this.makeAllCenterCardsBlocked(e, index);
+                this.makeAllPlayersCardsBlocked(e, index);
+              } else {
+
+              }
+            }
+
+          }
+        }
+      },
+      robberRole(e, index) {
+        for (let i = 0; i < this.constArrPlayers.length; i++) {
+          if (this.constArrPlayers[i].constIndex === 4) {
+            if (this.constIndex !== 4 && this.active) {
+              this.makeAllPlayersCardsBlocked(e, index);
+              if (this.flipped) {
+                this.swapCardRobber(e, index);
+                this.hideCard();
+              } else {
+                this.showCardRobber(e, index);
+                this.watchCardNoHide();
+              }
+            }
+          }
+        }
+      },
+      troublemakerRole(e, index) {
+        for (let i = 0; i < this.constArrPlayers.length; i++) {
+          if (this.constArrPlayers[i].constIndex === 5) {
+            if (this.constIndex !== 5 && this.active && !this.blocked) {
+              // первый клик
+              let tempArr = [];
+              if (!this.picked) {
+                for (let y = 0; y < this.playersArr.length; y++) {
+                  if (this.playersArr[y].picked) {
+                    tempArr.push(this.playersArr[y].picked);
+                    this.swapCardTroubleMaker(e, index);
+                    this.makeAllCardsUnpicked(e, index);
+                  }
+                }
+              }
+              if (tempArr.length === 0) {
+                this.pickCardTroubleMaker(e, index);
+              }
+            }
+          }
+        }
+      },
+      drunkRole(e, index) {
+        for (let i = 0; i < this.constArrPlayers.length; i++) {
+          if (this.constArrPlayers[i].constIndex === 6) {
+            if (this.centered && !this.blocked) {
+              this.swapCardDrunk(e, index);
+            }
+          }
+        }
+      },
+      insomniacRole(e, index) {
+        for (let i = 0; i < this.constArrPlayers.length; i++) {
+          if (this.constArrPlayers[i].constIndex === 7) {
+            if (!this.blocked && this.active) {
+              this.watchCard();
+              this.makeAllPlayersCardsBlocked(e, index);
+            }
+          }
+        }
+      },
       selfRoleFunction(e, index) {
         switch (this.watchAllCards) {
           case true:
@@ -73,123 +186,27 @@
           switch (this.currentStep) {
             // werewolf
             case 1:
-              if (this.wolfsArr.length === 1) {
-                if (this.centered && !this.blocked) {
-                  this.watchCard();
-                  this.makeAllCenterCardsBlocked(e, index);
-                }
-              }
+              this.singleWolf(e, index);
               break;
             // seer
             case 3:
-
-              for (let i = 0; i < this.constArrPlayers.length; i++) {
-
-                if (this.constArrPlayers[i].constIndex === 3) {
-
-                  if (this.constIndex !== 3 && this.centered) {
-
-                    this.makeAllPlayersCardsBlocked(e, index);
-
-                    this.watchCard();
-
-                    this.makeOneCenterCardBlocked(e, index);
-
-                    let cardsArr = [];
-
-                    for (let i = 0; i < this.centerCards.length; i++) {
-                      if (this.centerCards[i].blocked) {
-                        cardsArr.push(this.centerCards[i]);
-                      }
-                    }
-                    if (cardsArr.length > 1) {
-                      this.makeAllCenterCardsBlocked(e, index);
-                    }
-                  }
-                  else if (this.constIndex !== 3 && this.active) {
-
-                    let cardsArr = [];
-
-                    for (let i = 0; i < this.centerCards.length; i++) {
-                      if (this.centerCards[i].blocked) {
-                        cardsArr.push(this.centerCards[i]);
-                      }
-                    }
-
-                    // если нажали на одну центральную карту, а потом на игровую
-
-                    if (cardsArr.length <= 0) {
-                      this.watchCard();
-                      this.makeAllCenterCardsBlocked(e, index);
-                      this.makeAllPlayersCardsBlocked(e, index);
-                    } else {
-
-                    }
-                  }
-
-                }
-              }
+              this.seerRole(e, index);
               break;
             // robber
             case 4:
-              for (let i = 0; i < this.constArrPlayers.length; i++) {
-                if (this.constArrPlayers[i].constIndex === 4) {
-                  if (this.constIndex !== 4 && this.active) {
-                    this.makeAllPlayersCardsBlocked(e, index);
-                    if (this.flipped) {
-                      this.swapCardRobber(e, index);
-                      this.hideCard();
-                    } else {
-                      this.showCardRobber(e, index);
-                      this.watchCardNoHide();
-                    }
-                  }
-                }
-              }
+              this.robberRole(e, index);
               break;
             // troublemaker
             case 5:
-              for (let i = 0; i < this.constArrPlayers.length; i++) {
-
-                if (this.constArrPlayers[i].constIndex === 5) {
-
-                  if (this.constIndex !== 5 && this.active && !this.blocked) {
-
-                    // первый клик
-
-                    let tempArr = [];
-
-                    if(!this.picked){
-                      for (let y = 0; y < this.playersArr.length; y++) {
-                        if (this.playersArr[y].picked) {
-                          tempArr.push(this.playersArr[y].picked);
-                          this.swapCardTroubleMaker(e, index);
-                          this.makeAllCardsUnpicked(e, index);
-                          console.log('swap card')
-
-                        }
-                      }
-                    }
-                    if (tempArr.length === 0) {
-                      this.pickCardTroubleMaker(e, index);
-                      console.log('pick card')
-                      // this.makeAllCenterCardsBlocked(e, index);
-                      // this.makeAllPlayersCardsBlocked(e, index);
-                    }
-                  }
-                }
-              }
+              this.troublemakerRole(e, index);
               break;
             // drunk
             case 6:
-              for (let i = 0; i < this.constArrPlayers.length; i++) {
-                if (this.constArrPlayers[i].constIndex === 6) {
-                  if (this.centered && !this.blocked) {
-                    this.swapCardDrunk(e, index);
-                  }
-                }
-              }
+              this.drunkRole(e, index);
               break;
+            // insomniac
+            case 7:
+              this.insomniacRole(e, index);
           }
         }
       },
@@ -245,6 +262,12 @@
       },
 
       swapCardDrunk(e, index) {
+        this.$emit('swapcarddrunk', {
+          position: this.position
+        });
+      },
+
+      checkCardInsomniac(e, index){
         this.$emit('swapcarddrunk', {
           position: this.position
         });

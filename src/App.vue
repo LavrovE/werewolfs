@@ -265,7 +265,7 @@
         }
       },
 
-      refreshCenterAndActiveCards(){
+      refreshCenterAndActiveCards() {
         for (let i = 0; i < this.centerCards.length; i++) {
           this.centerCards[i].centered = true;
           this.centerCards[i].active = false;
@@ -289,7 +289,7 @@
         this.unblockPlayerCards();
       },
 
-      stepTroublemaker(){
+      stepTroublemaker() {
         this.unblockPlayerCards();
       },
 
@@ -326,7 +326,6 @@
         if (this.currentStep < 2) {
           this.stepWolves();
         }
-
 
 
         let self = this;
@@ -373,7 +372,11 @@
               }
               break;
             case 7:
-              console.log('insomniac');
+              for (let i = 0; i < self.playersArr.length; i++) {
+                if (self.constArrPlayers[i].constIndex === 7) {
+                  self.playersArr[i].blocked = false;
+                }
+              }
               break;
           }
           if (self.currentStep > self.activeRoles) {
@@ -399,15 +402,14 @@
         this.centerCards[index].blocked = true;
       },
 
-      onMakeAllCardsUnpicked(index, data){
+      onMakeAllCardsUnpicked(index, data) {
         for (let i = 0; i < this.cards.length; i++) {
           this.cards[i].picked = false;
         }
       },
 
       onShowCardRobber(index, data) {
-          console.log(data);
-          this.playersArr[data.position].flipped = true;
+        this.playersArr[data.position].flipped = true;
       },
 
 
@@ -431,20 +433,20 @@
         this.$set(this.playersArr, robberCardIndex, temp);
       },
 
-      onPickCardTroubleMaker(index, data){
+      onPickCardTroubleMaker(index, data) {
 
         this.playersArr[data.position].picked = true;
 
       },
 
-      onSwapCardsTroubleMaker(index, data){
+      onSwapCardsTroubleMaker(index, data) {
 
         let temp = this.playersArr[data.position];
 
         let pickedCardIndex;
 
-        for(let i=0;i<this.playersArr.length;i++){
-          if(this.playersArr[i].picked){
+        for (let i = 0; i < this.playersArr.length; i++) {
+          if (this.playersArr[i].picked) {
             pickedCardIndex = i;
           }
         }
@@ -453,12 +455,12 @@
         this.blockAllCards();
       },
 
-      onSwapCardDrunk(index, data){
+      onSwapCardDrunk(index, data) {
         let clickedCard = this.centerCards[data.position];
         let constDrunkCardIndex;
 
-        for(let i=0;i<this.constArrPlayers.length;i++){
-          if(this.constArrPlayers[i].constIndex === 6){
+        for (let i = 0; i < this.constArrPlayers.length; i++) {
+          if (this.constArrPlayers[i].constIndex === 6) {
             constDrunkCardIndex = i;
           }
         }
