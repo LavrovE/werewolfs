@@ -41,6 +41,7 @@
             @swapcarddrunk="onSwapCardDrunk(index, $event)"
             @changedata="onChangeData(index, $event)"
             :finalButton="finalButton"
+            :currentRoleCard="card.currentRoleCard"
           >
           </app-card>
         </div>
@@ -96,6 +97,7 @@
           @swapcarddrunk="onSwapCardDrunk(index, $event)"
           @changedata="onChangeData(index, $event)"
           :finalButton="finalButton"
+          :currentRoleCard="card.currentRoleCard"
         >
         </app-card>
       </div>
@@ -153,6 +155,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 0
           },
           {
@@ -161,6 +164,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 1
           },
           {
@@ -170,6 +174,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 2
           },
           {
@@ -178,6 +183,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 3
           },
           {
@@ -186,6 +192,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 4
           },
           {
@@ -194,6 +201,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 5
           },
           {
@@ -202,6 +210,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 6
           },
           {
@@ -210,6 +219,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 7
           },
           {
@@ -218,6 +228,7 @@
             blocked: true,
             flipped: false,
             picked: false,
+            currentRoleCard: false,
             constIndex: 9
           }
         ]
@@ -249,6 +260,7 @@
             for (let i = 0; i < this.constArrPlayers.length; i++) {
               if (this.constArrPlayers[i].constIndex === 3) {
                 this.stepSeer();
+                this.constArrPlayers[i].currentRoleCard = true;
               }
             }
             break;
@@ -256,6 +268,7 @@
             for (let i = 0; i < this.constArrPlayers.length; i++) {
               if (this.constArrPlayers[i].constIndex === 4) {
                 this.stepRobber();
+                this.constArrPlayers[i].currentRoleCard = true;
               }
             }
             break;
@@ -263,20 +276,22 @@
             for (let i = 0; i < this.constArrPlayers.length; i++) {
               if (this.constArrPlayers[i].constIndex === 5) {
                 this.stepTroublemaker();
+                this.constArrPlayers[i].currentRoleCard = true;
               }
             }
             break;
           case 6:
-
             for (let i = 0; i < this.constArrPlayers.length; i++) {
               if (this.constArrPlayers[i].constIndex === 6) {
                 this.unblockCenterCards();
+                this.constArrPlayers[i].currentRoleCard = true;
               }
             }
             break;
           case 7:
-            for (let i = 0; i < this.playersArr.length; i++) {
+            for (let i = 0; i < this.constArrPlayers.length; i++) {
               if (this.constArrPlayers[i].constIndex === 7) {
+                this.playersArr[i].currentRoleCard = true;
                 this.playersArr[i].blocked = false;
               }
             }
@@ -333,6 +348,14 @@
         for (let i = 0; i < this.playersArr.length; i++) {
           this.playersArr[i].blocked = false;
         }
+      },
+
+      removeActiveRoleCard(){
+
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].currentRoleCard = false;
+        }
+
       },
 
       blockAllCards() {
@@ -424,6 +447,8 @@
 
           self.blockAllCards();
 
+          self.removeActiveRoleCard();
+
           self.currentStep++;
 
           self.refreshAllClassesCards();
@@ -469,7 +494,6 @@
         this.playersArr[data.position].blocked = false;
 
       },
-
 
       onSwapCardRobber(index, data) {
 
@@ -547,6 +571,7 @@
 <style>
   html {
     font-size: 0.05208vw;
+    overflow: hidden;
   }
 
   .flex-center {

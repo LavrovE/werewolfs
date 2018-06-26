@@ -7,7 +7,7 @@
          'unblocked' :!blocked,
          'watchcards' : watchAllCards,
          'flipped': flipped,
-         'currentCard': currentCard && !watchAllCards && !centered && constIndex>2,
+         'currentCard': currentRoleCard && !watchAllCards && !centered && constIndex>2,
           'final':finalButton
           }"
          @click="onClick"
@@ -43,7 +43,8 @@
       'blocked',
       'flipped',
       'picked',
-      'finalButton'
+      'finalButton',
+      'currentRoleCard'
     ],
     data() {
       return {
@@ -51,9 +52,7 @@
       }
     },
     computed: {
-      currentCard() {
-        return this.currentStep === this.constIndex;
-      }
+
     },
     methods: {
       watchCard() {
@@ -79,6 +78,7 @@
         }
       },
       seerRole(e, index) {
+
         for (let i = 0; i < this.constArrPlayers.length; i++) {
 
           if (this.constArrPlayers[i].constIndex === 3) {
@@ -310,6 +310,9 @@
   .picked {
     border: 3rem solid #e6fb07;
     background-image: url("/src/img/picked.png");
+    -webkit-box-shadow: 0px 0px 21px 11px rgba(238, 255, 0, 1);
+    -moz-box-shadow: 0px 0px 21px 11px rgba(238, 255, 0, 1);
+    box-shadow: 0px 0px 21px 11px rgba(238, 255, 0, 1);
   }
 
   .blocked {
