@@ -40,9 +40,26 @@
             @makeallcardsunpicked="onMakeAllCardsUnpicked(index, $event)"
             @swapcarddrunk="onSwapCardDrunk(index, $event)"
             @changedata="onChangeData(index, $event)"
+            :finalButton="finalButton"
           >
           </app-card>
         </div>
+      </div>
+      <transition name="boom" mode="out-in">
+        <div class="current-role-wrapper" v-if="showRoleInstruction">
+          <h2>Текущий ход: {{ roleNameFromIndex }}</h2>
+          <h1 class="current-role"
+              :style="currentBackground"
+          >
+          </h1>
+        </div>
+      </transition>
+      <div v-if="endGame" class="final-button-wrapper">
+        <h1 class="final-button"
+            @click="showAllCards"
+        >
+          Показать все карты
+        </h1>
       </div>
       <div class="flex-flop"
            v-if="checkRoles || game"
@@ -78,6 +95,7 @@
           @makeallcardsunpicked="onMakeAllCardsUnpicked(index, $event)"
           @swapcarddrunk="onSwapCardDrunk(index, $event)"
           @changedata="onChangeData(index, $event)"
+          :finalButton="finalButton"
         >
         </app-card>
       </div>
@@ -89,8 +107,6 @@
       >
 
       </app-button>
-      <p>current role - {{roleNameFromIndex}}</p>
-      <p>current role id - {{currentStep}}</p>
     </div>
   </div>
 </template>
@@ -124,12 +140,16 @@
         secondsForEachRole: 10000,
         // число активных игроков (у которых есть свой ход в игре)
         activeRoles: 7,
+        // флаг для анимации подсказки текущей роли
+        showRoleInstruction: false,
+        finalButton:false,
+        endGame:false,
         watchAllCards: true,
         wolfsArr: [],
         cards: [
           {
             name: 'Werewolf',
-            img: './img/werewolf.png',
+            img: '/src/img/werewolf.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -137,7 +157,7 @@
           },
           {
             name: 'Werewolf',
-            img: './img/werewolf.png',
+            img: '/src/img/werewolf.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -146,7 +166,7 @@
           {
             name: 'Minion',
             actions: [],
-            img: './img/minion.png',
+            img: '/src/img/minion.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -154,7 +174,7 @@
           },
           {
             name: 'Seer',
-            img: './img/seer.png',
+            img: '/src/img/seer.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -162,7 +182,7 @@
           },
           {
             name: 'Robber',
-            img: './img/robber.png',
+            img: '/src/img/robber.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -170,7 +190,7 @@
           },
           {
             name: 'Troublemaker',
-            img: './img/troublemaker.png',
+            img: '/src/img/troublemaker.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -178,7 +198,7 @@
           },
           {
             name: 'Drunk',
-            img: './img/drunk.png',
+            img: '/src/img/drunk.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -186,7 +206,7 @@
           },
           {
             name: 'Insomniac',
-            img: './img/insomniac.png',
+            img: '/src/img/insomniac.png',
             blocked: true,
             flipped: false,
             picked: false,
@@ -194,11 +214,11 @@
           },
           {
             name: 'Prince',
-            img: './img/prince.png',
+            img: '/src/img/prince.png',
             blocked: true,
             flipped: false,
             picked: false,
-            constIndex: 8
+            constIndex: 9
           }
         ]
       }
@@ -212,12 +232,69 @@
     computed: {
       roleNameFromIndex() {
         return this.cards[this.currentStep].name;
+      },
+      currentBackground() {
+        return 'background-image:url(' + this.cards[this.currentStep].img + ')';
+      }
+    },
+    watch: {
+      currentStep: function () {
+
+        // Добавляем классы, роли , варианты ходов в зависимости от текущего
+
+        switch (this.currentStep) {
+          case 2:
+            break;
+          case 3:
+            for (let i = 0; i < this.constArrPlayers.length; i++) {
+              if (this.constArrPlayers[i].constIndex === 3) {
+                this.stepSeer();
+              }
+            }
+            break;
+          case 4:
+            for (let i = 0; i < this.constArrPlayers.length; i++) {
+              if (this.constArrPlayers[i].constIndex === 4) {
+                this.stepRobber();
+              }
+            }
+            break;
+          case 5:
+            for (let i = 0; i < this.constArrPlayers.length; i++) {
+              if (this.constArrPlayers[i].constIndex === 5) {
+                this.stepTroublemaker();
+              }
+            }
+            break;
+          case 6:
+
+            for (let i = 0; i < this.constArrPlayers.length; i++) {
+              if (this.constArrPlayers[i].constIndex === 6) {
+                this.unblockCenterCards();
+              }
+            }
+            break;
+          case 7:
+            for (let i = 0; i < this.playersArr.length; i++) {
+              if (this.constArrPlayers[i].constIndex === 7) {
+                this.playersArr[i].blocked = false;
+              }
+            }
+            break;
+        }
       }
     },
     methods: {
       centerDisabled(index, data) {
         this.showCenter = data.showCenter;
-        console.log(this.showCenter)
+      },
+
+      refreshAllClassesCards() {
+        this.blockAllCards();
+        this.refreshCenterAndActiveCards();
+        this.unflipAllCards();
+        this.unpickAllCards();
+
       },
       shuffleCards() {
         for (let i = 0; i < this.players.length; i++) {
@@ -243,7 +320,6 @@
       unblockAllCards() {
         for (let i = 0; i < this.cards.length; i++) {
           this.cards[i].blocked = false;
-          console.log('unblocked')
         }
       },
 
@@ -262,6 +338,18 @@
       blockAllCards() {
         for (let i = 0; i < this.cards.length; i++) {
           this.cards[i].blocked = true;
+        }
+      },
+
+      unpickAllCards() {
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].picked = false;
+        }
+      },
+
+      unflipAllCards() {
+        for (let i = 0; i < this.cards.length; i++) {
+          this.cards[i].flipped = false;
         }
       },
 
@@ -321,67 +409,30 @@
 
         let step = data.firstRole;
 
+
         this.currentStep = step;
 
-        if (this.currentStep < 2) {
+        this.showRoleInstruction = true;
+
+        if (this.wolfsArr.length === 1) {
           this.stepWolves();
         }
-
 
         let self = this;
 
         let timerId = setInterval(function () {
 
+          self.blockAllCards();
+
           self.currentStep++;
 
-          // Добавляем классы, роли , варианты ходов в зависимости от текущего
+          self.refreshAllClassesCards();
 
-          switch (self.currentStep) {
-            case 2:
-              console.log('minion');
-              break;
-            case 3:
-              console.log('seer');
-              for (let i = 0; i < self.constArrPlayers.length; i++) {
-                if (self.constArrPlayers[i].constIndex === 3) {
-                  self.stepSeer();
-                }
-              }
-              break;
-            case 4:
-              console.log('robber');
-              for (let i = 0; i < self.constArrPlayers.length; i++) {
-                if (self.constArrPlayers[i].constIndex === 4) {
-                  self.stepRobber();
-                } else {
-                }
-              }
-              break;
-            case 5:
-              for (let i = 0; i < self.constArrPlayers.length; i++) {
-                if (self.constArrPlayers[i].constIndex === 5) {
-                  self.stepTroublemaker();
-                }
-              }
-              break;
-            case 6:
-              for (let i = 0; i < self.constArrPlayers.length; i++) {
-                if (self.constArrPlayers[i].constIndex === 6) {
-                  self.unblockCenterCards();
-                }
-              }
-              break;
-            case 7:
-              for (let i = 0; i < self.playersArr.length; i++) {
-                if (self.constArrPlayers[i].constIndex === 7) {
-                  self.playersArr[i].blocked = false;
-                }
-              }
-              break;
-          }
           if (self.currentStep > self.activeRoles) {
             clearInterval(timerId);
-            console.log('end of game')
+            self.blockAllCards();
+            self.showRoleInstruction = false;
+            self.endGame = true;
           }
 
         }, this.secondsForEachRole);
@@ -409,7 +460,14 @@
       },
 
       onShowCardRobber(index, data) {
+
         this.playersArr[data.position].flipped = true;
+
+        for (let i = 0; i < this.playersArr.length; i++) {
+          this.playersArr[i].blocked = true;
+        }
+        this.playersArr[data.position].blocked = false;
+
       },
 
 
@@ -431,6 +489,8 @@
 
         this.$set(this.playersArr, data.position, this.playersArr[robberCardIndex]);
         this.$set(this.playersArr, robberCardIndex, temp);
+        this.blockAllCards();
+        this.unflipAllCards();
       },
 
       onPickCardTroubleMaker(index, data) {
@@ -470,6 +530,11 @@
 
         this.refreshCenterAndActiveCards();
         this.blockAllCards();
+      },
+
+      showAllCards(){
+        this.unblockAllCards();
+        this.finalButton = true;
       }
 
     },
@@ -480,6 +545,10 @@
   }
 </script>
 <style>
+  html {
+    font-size: 0.05208vw;
+  }
+
   .flex-center {
     display: flex;
     justify-content: center;
@@ -489,4 +558,133 @@
     display: flex;
     justify-content: space-between;
   }
+
+  body {
+    background-image: url(/src/img/bg.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    max-width: 1920rem;
+    margin: 0 auto;
+    overflow: hidden;
+    transition: 0.2s;
+  }
+
+  body * {
+    transition: 0.2s;
+  }
+
+  .container-fluid {
+    padding-right: 15rem;
+    padding-left: 15rem;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .first-step {
+    max-width: 400rem;
+    display: block;
+    margin: 0 auto;
+    padding: 0 90rem;
+    background-color: #4dff28;
+    border-radius: 10rem;
+    cursor: pointer;
+  }
+
+  .first-step h1 {
+    line-height: 109rem;
+  }
+
+  .first-step:hover {
+    background-color: #d58512;
+  }
+
+  .current-role-wrapper {
+    display: flex;
+    width: 100%;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    background-repeat: no-repeat;
+
+  }
+
+  .current-role-wrapper h2 {
+    color: #e5fa04;
+    margin-right: 20rem;
+    background: #e5fa043b;
+    padding: 20rem;
+    border-radius: 12rem;
+    border: 2rem solid #e5fa04;
+  }
+
+  .current-role {
+    background-repeat: no-repeat;
+    display: block;
+    height: 100rem;
+    background-size: cover;
+    width: 100rem;
+    border-radius: 200rem;
+    border: 2rem solid #e5fa04;
+  }
+
+  .boom-enter-active {
+    animation: slideIn 0.5s;
+  }
+
+  .boom-enter-to {
+    animation: slideIn 0.5s;
+  }
+
+  .boom-leave {
+    animation: slideOut 0.5s;
+  }
+
+  .boom-leave-active {
+    animation: slideOut 0.5s;
+  }
+
+  .final-button-wrapper{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .final-button{
+    padding: 20rem 20rem;
+    -webkit-border-radius: 14px;
+    -moz-border-radius: 14px;
+    border-radius: 14px;
+    color: #000000;
+    background: #e5fa04;
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100vw);
+    }
+    to {
+      transform: translateX(0px);
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0px);
+    }
+    to {
+      transform: translateX(-100vw);
+    }
+  }
+
+  @media (min-width: 992px) and (min-device-width: 992px) {
+
+  }
+
 </style>

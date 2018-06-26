@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="button-start"
+    <div class="start text-center"
          @click="startGame"
     >
-      Запуск сценария
+      <h1>Запуск сценария</h1>
     </div>
   </div>
 </template>
@@ -13,7 +13,7 @@
     props: ['currentStep'],
     data() {
       return {
-        firstRole: 4
+        firstRole: 1
       }
     },
     computed: {},
@@ -33,5 +33,17 @@
 </script>
 
 <style scoped>
-
+  .start {
+    display: block;
+    margin: 0 auto;
+    padding: 20rem 30rem;
+    background-color: #4dff28;
+    border-radius: 10rem;
+    cursor: pointer;
+  }
+  .start:hover{
+    background-color: #d58512;
+  }
+  .start h1 {
+  }
 </style>

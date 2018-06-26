@@ -1,22 +1,24 @@
 <template>
   <div>
-    watch all = {{watchAllCards}}
-    <br>
-    <span>
-      blocked = {{ blocked }}
-    </span>
     <div class="card"
+         :class="{
+          'picked': picked,
+         'blocked' :blocked ,
+         'unblocked' :!blocked,
+         'watchcards' : watchAllCards,
+         'flipped': flipped,
+         'currentCard': currentCard && !watchAllCards && !centered && constIndex>2,
+          'final':finalButton
+          }"
          @click="onClick"
     >
-      <h3 v-if="showCard">
+      <h3 v-if="showCard || finalButton"
+      >
         {{ name }}
       </h3>
       <h3 v-else-if="!showCard && active">
         {{players[position]}}
       </h3>
-      <p>card index = {{constIndex}}</p>
-      <p>flipped = {{flipped}}</p>
-      <p>picked = {{picked}}</p>
     </div>
   </div>
 </template>
@@ -40,14 +42,19 @@
       'centerCards',
       'blocked',
       'flipped',
-      'picked'
+      'picked',
+      'finalButton'
     ],
     data() {
       return {
         showCard: false
       }
     },
-    computed: {},
+    computed: {
+      currentCard() {
+        return this.currentStep === this.constIndex;
+      }
+    },
     methods: {
       watchCard() {
         if (!this.blocked || this.watchAllCards) {
@@ -122,8 +129,7 @@
       robberRole(e, index) {
         for (let i = 0; i < this.constArrPlayers.length; i++) {
           if (this.constArrPlayers[i].constIndex === 4) {
-            if (this.constIndex !== 4 && this.active) {
-              this.makeAllPlayersCardsBlocked(e, index);
+            if (this.constIndex !== 4 && this.active && !this.blocked) {
               if (this.flipped) {
                 this.swapCardRobber(e, index);
                 this.hideCard();
@@ -267,7 +273,7 @@
         });
       },
 
-      checkCardInsomniac(e, index){
+      checkCardInsomniac(e, index) {
         this.$emit('swapcarddrunk', {
           position: this.position
         });
@@ -284,10 +290,85 @@
 <style scoped>
 
   .card {
-    display: block;
-    background: red;
-    width: 150px;
-    height: 150px;
-    margin: 0px 20px;
+    background: url("/src/img/shirt.jpeg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 250rem;
+    background-position: left center;
+    margin: 10rem 16rem;
+    padding: 20rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10rem;
+    min-width: 240rem;
+    border: 3rem solid #e6fb07;
+    cursor: pointer;
+    transition: 0.2s;
   }
+
+  .picked {
+    border: 3rem solid #e6fb07;
+    background-image: url("/src/img/picked.png");
+  }
+
+  .blocked {
+    border: 3rem solid red;
+    filter: blur(0px) grayscale(75%);
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+  }
+
+  .unblocked {
+    border: 3rem solid #e6fb07;
+    filter: none;
+  }
+
+  .flipped {
+    border: 3rem solid #e6fb07 !important;
+    filter: none !important;
+  }
+
+  .watchcards {
+    border: 3rem solid #e6fb07;
+    filter: none;
+  }
+
+  .final {
+    background: #e6fb07;
+    transition: 0.2s;
+  }
+
+  .currentCard {
+    -webkit-box-shadow: 0px 0px 41px 17px rgba(238, 255, 0, 1);
+    -moz-box-shadow: 0px 0px 41px 17px rgba(238, 255, 0, 1);
+    box-shadow: 0px 0px 41px 17px rgba(238, 255, 0, 1);
+  }
+
+  .blocked.currentCard {
+    -webkit-box-shadow: 0px 0px 41px 17px rgba(238, 255, 0, 1) !important;
+    -moz-box-shadow: 0px 0px 41px 17px rgba(238, 255, 0, 1) !important;
+    box-shadow: 0px 0px 41px 17px rgba(238, 255, 0, 1) !important;
+  }
+
+  .card h3 {
+    font-size: 24rem;
+    /*font-size: 0;*/
+    background: #eaff00fa;
+    padding: 12rem 8rem;
+    border-radius: 4rem;
+    color: #000000;
+  }
+
+  @media (min-width: 992px) and (min-device-width: 992px) {
+
+    .card:hover {
+      background: #e6fb07;
+      transition: 0.2s;
+    }
+
+  }
+
+
 </style>
